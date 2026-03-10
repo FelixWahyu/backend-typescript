@@ -23,6 +23,7 @@ if (env.isDev()) {
 
 // ─── Routes ───────────────────────────────────────────────────────────────────
 app.use(`/api/${env.API_VERSION}`, routes);
+app.use(`/api/${env.API_VERSION}`, routes);
 
 // ─── Error Handling ───────────────────────────────────────────────────────────
 app.use(notFoundHandler);
