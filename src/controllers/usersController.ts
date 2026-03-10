@@ -1,18 +1,11 @@
 import { NextFunction, Request, Response } from "express";
 import { sendSuccess } from "../utils/response";
+import { allUsers } from "../services/userService";
 
-export const getUsers = (_req: Request, res: Response, next: NextFunction): void => {
+export const getUsers = async (_req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    sendSuccess(
-      res,
-      {
-        id: 1,
-        name: "Felix",
-        email: "felix@gmail.com",
-        timestamp: new Date().toISOString(),
-      },
-      "Gel all data success",
-    );
+    const result = await allUsers();
+    sendSuccess(res, result, "Gel all data success");
   } catch (error) {
     next(error);
   }

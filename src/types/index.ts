@@ -1,5 +1,10 @@
 import { Request } from "express";
 
+export interface ApiError {
+  field?: string;
+  message: string;
+}
+
 // Extended Request with authenticated user
 export interface AuthRequest extends Request {
   user?: {
@@ -14,10 +19,11 @@ export interface ApiResponse<T = unknown> {
   success: boolean;
   message: string;
   data?: T;
-  error?: string;
+  errors?: ApiError[] | null;
   meta?: {
     page?: number;
     limit?: number;
     total?: number;
-  };
+    totalPages?: number;
+  } | null;
 }
