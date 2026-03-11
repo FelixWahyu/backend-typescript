@@ -7,8 +7,4 @@ const router = Router();
 router.get("/health", healthCheck);
 router.use("/users", usersRoutes);
 
-// Register your routes here:
-// router.use('/users', userRoutes);
-// router.use('/auth', authRoutes);
-
 export default router;
