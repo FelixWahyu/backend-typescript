@@ -1,7 +1,7 @@
 import { Role } from "@/generated/prisma/enums";
 
 export interface CreateUserDto {
-  name: string;
+  name: string | null;
   username: string;
   email: string;
   password: string;
@@ -9,7 +9,7 @@ export interface CreateUserDto {
 }
 
 export interface UpdateUserDto {
-  name?: string;
+  name?: string | null;
   username?: string;
   email?: string;
   role?: Role;
@@ -17,7 +17,7 @@ export interface UpdateUserDto {
 
 export interface UserResponse {
   id: string;
-  name: string;
+  name?: string | null;
   username: string;
   email: string;
   role: Role;
