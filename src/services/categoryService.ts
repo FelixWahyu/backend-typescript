@@ -10,23 +10,29 @@ const selectCategory = {
 } as const;
 
 export const findAllCategory = async (query: PaginationQuery = {}): Promise<CategoryResponse[]> => {
-  const page = Math.max(1, query.page ?? 1);
-  const limit = Math.min(10, Math.max(1, query.limit ?? 10));
-  const skip = (page - 1) * limit;
+  // const page = Math.max(1, query.page ?? 1);
+  // const limit = Math.min(10, Math.max(1, query.limit ?? 10));
+  // const skip = (page - 1) * limit;
 
-  const [data, total] = prisma.$transaction([
-    prisma.category.findMany({
-      select: selectCategory,
-      skip,
-      take: limit,
-      orderBy: { createdAt: "desc" },
-    }),
-    prisma.category.count(),
-  ]);
+  // const [data, total] = prisma.$transaction([
+  //   prisma.category.findMany({
+  //     select: selectCategory,
+  //     skip,
+  //     take: limit,
+  //     orderBy: { createdAt: "desc" },
+  //   }),
+  //   prisma.category.count(),
+  // ]);
 
-  const result = { data, meta: { page, limit, total, totalPage: Math.ceil(total / limit) } };
+  // const result = { data, meta: { page, limit, total, totalPage: Math.ceil(total / limit) } };
 
-  return result;
+  const categories = await prisma.category.findMany({ select: selectCategory, orderBy: { createdAt: "desc" } });
+
+  if (!categories) {
+    throw new AppError("Gagal mengambil data kategori", 500);
+  }
+
+  return categories;
 };
 
 export const findCategoryById = async (id: string): Promise<CategoryResponse> => {
@@ -81,7 +87,7 @@ export const createCategory = async (dto: CreateCategoryDto): Promise<CategoryRe
   return category;
 };
 
-export const UpdateCategory = async (id: string, dto: UpdateCategoryDto): Promise<CategoryResponse> => {
+export const updateCategory = async (id: string, dto: UpdateCategoryDto): Promise<CategoryResponse> => {
   await findCategoryById(id);
 
   if (dto.category_name || dto.slug) {

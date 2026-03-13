@@ -1,6 +1,6 @@
 import { Router } from "express";
-import { uploadSingle, uploadMultiple } from "@/config/multer";
-import { createProductHandler, createProductWithGalleryHandler, addImagesHandler, deleteImageHandler } from "@/controllers/productController";
+import { uploadSingle, uploadMultiple } from "../config/multer";
+import { createProductHandler, createProductWithGalleryHandler, addImagesHandler, deleteImageHandler } from "../controllers/productController";
 
 const router = Router();
 

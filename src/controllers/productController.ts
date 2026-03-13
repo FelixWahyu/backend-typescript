@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
-import { sendSuccess, sendCreated } from "@/utils/response";
-import { deleteFiles } from "@/utils/fileHelper";
-import { createProduct, createProductWithImages, addProductImages, deleteProductImage } from "@/services/productService";
+import { sendSuccess, sendCreated } from "../utils/response";
+import { deleteFiles } from "../utils/fileHelper";
+import { createProduct, createProductWithImages, addProductImages, deleteProductImage } from "../services/productService";
 
 // POST /products — upload satu gambar
 export const createProductHandler = async (req: Request, res: Response, next: NextFunction): Promise<void> => {

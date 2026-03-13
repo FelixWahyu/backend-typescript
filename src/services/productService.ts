@@ -1,7 +1,7 @@
-import { prisma } from "@/lib/prisma";
-import { AppError } from "@/utils/appError";
-import { deleteFile, deleteFiles } from "@/utils/fileHelper";
-import { CreateProductDto, CreateProductWithImagesDto, ProductResponse } from "@/types/product.type";
+import { prisma } from "../lib/prisma";
+import { AppError } from "../utils/appError";
+import { deleteFile, deleteFiles } from "../utils/fileHelper";
+import { CreateProductDto, CreateProductWithImagesDto, ProductResponse } from "../types/product.type";
 
 const productSelect = {
   id: true,

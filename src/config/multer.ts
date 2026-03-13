@@ -2,7 +2,7 @@ import multer, { FileFilterCallback } from "multer";
 import path from "path";
 import fs from "fs";
 import { Request } from "express";
-import { AppError } from "@/utils/appError";
+import { AppError } from "../utils/appError";
 
 // Pastikan folder uploads ada
 const uploadDir = "uploads/products";
