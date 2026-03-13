@@ -27,7 +27,9 @@ export const findAllUsers = async (query: PaginateQuery = {}) => {
     prisma.user.count(),
   ]);
 
-  return { data, meta: { page, limit, total, totalPages: Math.ceil(total / limit) } };
+  const result = { data, meta: { page, limit, total, totalPages: Math.ceil(total / limit) } };
+
+  return result;
 };
 
 export const findUserById = async (id: string): Promise<UserResponse> => {

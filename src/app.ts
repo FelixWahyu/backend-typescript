@@ -5,6 +5,7 @@ import morgan from "morgan";
 import { env } from "./config/env";
 import routes from "./routes/index";
 import { errorHandler, notFoundHandler } from "./middlewares/errorHandler";
+import path from "path";
 
 const app: Application = express();
 
@@ -24,6 +25,7 @@ if (env.isDev()) {
 // ─── Routes ───────────────────────────────────────────────────────────────────
 app.use(`/api/${env.API_VERSION}`, routes);
 app.use(`/api/${env.API_VERSION}`, routes);
+app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 
 // ─── Error Handling ───────────────────────────────────────────────────────────
 app.use(notFoundHandler);

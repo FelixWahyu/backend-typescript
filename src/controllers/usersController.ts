@@ -12,7 +12,7 @@ export const getUsers = async (req: Request, res: Response, next: NextFunction):
       page: Number(req.query.page) || 1,
       limit: Number(req.query.limit) || 10,
     });
-    sendSuccess(res, result, "Get all data success", 200, result.meta);
+    sendSuccess(res, result.data, "Get all data success", 200, result.meta);
   } catch (error) {
     next(error);
   }
