@@ -1,5 +1,6 @@
 export interface CreateProductDto {
-  name: string;
+  product_name: string;
+  slug: string;
   description?: string;
   price: number;
   image?: string;
@@ -10,6 +11,16 @@ export interface CreateProductWithImagesDto extends CreateProductDto {
   images?: string[];
 }
 
+export interface UpdateProductDto {
+  product_name?: string;
+  slug?: string;
+  categoryId?: string;
+  price?: number;
+  description?: string;
+  image?: string;
+  images?: CreateProductWithImagesDto;
+}
+
 export interface ProductImageResponse {
   id: string;
   url: string;
@@ -18,7 +29,8 @@ export interface ProductImageResponse {
 
 export interface ProductResponse {
   id: string;
-  name: string;
+  product_name: string;
+  slug: string;
   description: string | null;
   price: number;
   image: string | null;
