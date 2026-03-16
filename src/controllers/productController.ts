@@ -3,6 +3,11 @@ import { sendSuccess, sendCreated } from "../utils/response";
 import { deleteFiles } from "../utils/fileHelper";
 import { createProduct, createProductWithImages, addProductImages, deleteProductImage } from "../services/productService";
 
+interface ProductParams {
+  id: string;
+  imageId: string;
+}
+
 // POST /products — upload satu gambar
 export const createProductHandler = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
@@ -46,7 +51,7 @@ export const createProductWithGalleryHandler = async (req: Request, res: Respons
 };
 
 // POST /products/:id/images — tambah gambar ke gallery
-export const addImagesHandler = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+export const addImagesHandler = async (req: Request<ProductParams>, res: Response, next: NextFunction): Promise<void> => {
   try {
     const files = req.files as Express.Multer.File[];
     const imagePaths = files?.map((f) => `uploads/products/${f.filename}`) ?? [];
@@ -63,7 +68,7 @@ export const addImagesHandler = async (req: Request, res: Response, next: NextFu
 };
 
 // DELETE /products/images/:imageId — hapus satu gambar dari gallery
-export const deleteImageHandler = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+export const deleteImageHandler = async (req: Request<ProductParams>, res: Response, next: NextFunction): Promise<void> => {
   try {
     await deleteProductImage(req.params.imageId);
     sendSuccess(res, null, "Gambar berhasil dihapus");
