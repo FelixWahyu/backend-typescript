@@ -18,7 +18,7 @@ export interface UpdateProductDto {
   price?: number;
   description?: string;
   image?: string;
-  images?: CreateProductWithImagesDto;
+  images?: string[];
 }
 
 export interface ProductImageResponse {
@@ -31,9 +31,22 @@ export interface ProductResponse {
   id: string;
   product_name: string;
   slug: string;
+  category: {
+    id: string;
+    category_name: string;
+    slug: string;
+  } | null;
   description: string | null;
   price: number;
   image: string | null;
   images: ProductImageResponse[];
   createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface PaginateProductQuery {
+  page?: number;
+  limit?: number;
+  categoryId?: string;
+  search?: string;
 }
