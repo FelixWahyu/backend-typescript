@@ -53,3 +53,12 @@ export const uploadMultiple = multer({
     files: 5,
   },
 }).array("images", 5); // ← nama field di form-data, max 5
+
+export const uploadFields = multer({
+  storage,
+  fileFilter,
+  limits: { fileSize: 2 * 1024 * 1024, files: 6 },
+}).fields([
+  { name: "image", maxCount: 1 }, // gambar utama
+  { name: "images", maxCount: 5 }, // gallery
+]);

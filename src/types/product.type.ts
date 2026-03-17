@@ -18,7 +18,6 @@ export interface UpdateProductDto {
   price?: number;
   description?: string;
   image?: string;
-  images?: string[];
 }
 
 export interface ProductImageResponse {

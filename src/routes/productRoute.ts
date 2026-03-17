@@ -1,19 +1,15 @@
 import { Router } from "express";
-import { uploadSingle, uploadMultiple } from "../config/multer";
-import { createProductHandler, createProductWithGalleryHandler, addImagesHandler, deleteImageHandler } from "../controllers/productController";
+import { uploadSingle, uploadMultiple, uploadFields } from "../config/multer";
+import { getAllProducts, getProductById, createProductHandler, addImagesHandler, updateProductHandler, deleteImageHandler, deleteProductHandler } from "../controllers/productController";
 
 const router = Router();
 
-// Satu gambar utama
-router.post("/", uploadSingle, createProductHandler);
-
-// Banyak gambar sekaligus
-router.post("/gallery", uploadMultiple, createProductWithGalleryHandler);
-
-// Tambah gambar ke produk yang sudah ada
+router.get("/", getAllProducts);
+router.post("/", uploadFields, createProductHandler);
+router.get("/:id", getProductById);
 router.post("/:id/images", uploadMultiple, addImagesHandler);
-
-// Hapus satu gambar dari gallery
+router.put("/:id", uploadSingle, updateProductHandler);
 router.delete("/images/:imageId", deleteImageHandler);
+router.delete("/:id", deleteProductHandler);
 
 export default router;
