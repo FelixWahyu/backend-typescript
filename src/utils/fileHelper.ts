@@ -1,5 +1,6 @@
 import fs from "fs";
 import path from "path";
+import { Request } from "express";
 
 // Hapus file dari server
 export const deleteFile = (filePath: string): void => {
@@ -16,6 +17,6 @@ export const deleteFiles = (filePaths: string[]): void => {
 };
 
 // Build URL yang bisa diakses client
-export const buildFileUrl = (req: Express.Request, filePath: string): string => {
+export const buildFileUrl = (req: Request, filePath: string): string => {
   return `${req.protocol}://${req.get("host")}/${filePath}`;
 };
