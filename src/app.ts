@@ -10,8 +10,18 @@ import path from "path";
 const app: Application = express();
 
 // ─── Security & Parsing ───────────────────────────────────────────────────────
-app.use(helmet());
-app.use(cors());
+app.use(
+  helmet({
+    crossOriginResourcePolicy: { policy: "cross-origin" },
+  }),
+);
+app.use(
+  cors({
+    origin: env.isDev() ? "*" : process.env.ALLOWED_ORIGINS?.split(","),
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  }),
+);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -23,9 +33,8 @@ if (env.isDev()) {
 }
 
 // ─── Routes ───────────────────────────────────────────────────────────────────
-app.use(`/api/${env.API_VERSION}`, routes);
-app.use(`/api/${env.API_VERSION}`, routes);
 app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
+app.use(`/api/${env.API_VERSION}`, routes);
 
 // ─── Error Handling ───────────────────────────────────────────────────────────
 app.use(notFoundHandler);
