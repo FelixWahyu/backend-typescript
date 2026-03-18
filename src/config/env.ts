@@ -2,6 +2,14 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
+const requiredEnvVars = ["NODE_ENV", "PORT", "JWT_SECRET", "JWT_REFRESH_SECRET"] as const;
+
+for (const key of requiredEnvVars) {
+  if (!(key in process.env)) {
+    throw new Error(`Missing environment variable: ${key}`);
+  }
+}
+
 export const env = {
   NODE_ENV: process.env.NODE_ENV || "development",
   PORT: parseInt(process.env.PORT || "3000", 10),
@@ -16,8 +24,10 @@ export const env = {
   },
 
   JWT: {
-    SECRET: process.env.JWT_SECRET || "fallback-secret",
-    EXPIRES_IN: process.env.JWT_EXPIRES_IN || "7d",
+    JWT_SECRET: process.env.JWT_SECRET!,
+    JWT_EXPIRES_IN: process.env.JWT_EXPIRES_IN || "15m",
+    JWT_REFRESH_SECRET: process.env.JWT_REFRESH_SECRET!,
+    JWT_REFRESH_EXPIRES_IN: process.env.JWT_REFRESH_EXPIRES_IN || "7d",
   },
 
   isDev: () => env.NODE_ENV === "development",
