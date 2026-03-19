@@ -1,8 +1,9 @@
 import { NextFunction, Request, Response } from "express";
 import { sendSuccess, sendCreated } from "../utils/response";
 import { findAllUsers, createUser, findUserById, updateUserById, deleteUserById } from "../services/userService";
+import { ParamsDictionary } from "express-serve-static-core";
 
-interface UserParams {
+interface UserParams extends ParamsDictionary {
   id: string;
 }
 
