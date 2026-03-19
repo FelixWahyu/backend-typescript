@@ -3,7 +3,6 @@ import { prisma } from "../lib/prisma";
 import { AppError } from "../utils/appError";
 import { generateTokens, verifyRefreshToken } from "../utils/jwt";
 import { LoginDto, RegisterDto, AuthResponse } from "../types/auth.type";
-import { token } from "morgan";
 
 const userSelect = {
   id: true,
@@ -68,9 +67,11 @@ export const login = async (dto: LoginDto): Promise<AuthResponse> => {
   });
 
   await prisma.refreshToken.create({
-    token: tokens.refreshToken,
-    userId: user.id,
-    expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+    data: {
+      token: tokens.refreshToken,
+      userId: user.id,
+      expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+    },
   });
 
   return {
