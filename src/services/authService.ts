@@ -1,7 +1,7 @@
 import bcrypt from "bcrypt";
 import { prisma } from "../lib/prisma";
 import { AppError } from "../utils/appError";
-import { generateTokens, verifyRefreshToken } from "../utils/jwt";
+import { generateTokens, verifyRefreshToken, hashToken } from "../utils/jwt";
 import { LoginDto, RegisterDto, AuthResponse } from "../types/auth.type";
 
 const userSelect = {
@@ -41,7 +41,7 @@ export const register = async (dto: RegisterDto): Promise<AuthResponse> => {
 
   await prisma.refreshToken.create({
     data: {
-      token: tokens.refreshToken,
+      token: hashToken(tokens.refreshToken),
       userId: user.id,
       expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
     },
@@ -68,7 +68,7 @@ export const login = async (dto: LoginDto): Promise<AuthResponse> => {
 
   await prisma.refreshToken.create({
     data: {
-      token: tokens.refreshToken,
+      token: hashToken(tokens.refreshToken),
       userId: user.id,
       expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
     },
@@ -90,7 +90,7 @@ export const refreshToken = async (token: string): Promise<{ accessToken: string
   const payload = verifyRefreshToken(token);
 
   const savedToken = await prisma.refreshToken.findUnique({
-    where: { token },
+    where: { token: hashToken(token) },
     include: { user: true },
   });
 
