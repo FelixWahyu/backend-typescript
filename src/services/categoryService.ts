@@ -7,6 +7,7 @@ const selectCategory = {
   category_name: true,
   slug: true,
   createdAt: true,
+  updatedAt: true,
 } as const;
 
 export const findAllCategory = async (query: PaginationQuery = {}): Promise<CategoryResponse[]> => {

@@ -73,6 +73,28 @@ export const createUser = async (data: CreateUserDto) => {
   return user;
 };
 
+export const userCreate = async (dto: CreateUserDto): Promise<UserResponse> => {
+  const isExisting = await prisma.user.findFirst({
+    where: {
+      OR: [{ email: dto.email }, { username: dto.username }],
+    },
+  });
+
+  if (isExisting) {
+    if (isExisting.username === dto.username) throw new AppError("Username already taken", 409);
+
+    throw new AppError("Email already taken", 409);
+  }
+
+  const hashedPass = await bcrypt.hash(dto.password, 10);
+  const user = await prisma.user.create({
+    data: { ...dto, password: hashedPass },
+    select: userSelect,
+  });
+
+  return user;
+};
+
 export const updateUserById = async (id: string, data: UpdateUserDto): Promise<UserResponse> => {
   await findUserById(id);
 
