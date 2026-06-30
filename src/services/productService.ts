@@ -3,6 +3,9 @@ import { AppError } from "../utils/appError";
 import { deleteFile, deleteFiles } from "../utils/fileHelper";
 import { CreateProductDto, CreateProductWithImagesDto, PaginateProductQuery, ProductResponse, UpdateProductDto } from "../types/product.type";
 
+/**
+ * Field yang dipilih untuk response produk (termasuk relasi).
+ */
 const productSelect = {
   id: true,
   product_name: true,
@@ -25,6 +28,9 @@ const productSelect = {
   updatedAt: true,
 } as const;
 
+/**
+ * Ambil semua produk dengan pagination, filter category & search.
+ */
 export const findAllProducts = async (query: PaginateProductQuery = {}) => {
   const page = Math.max(1, query.page ?? 1);
   const limit = Math.min(100, Math.max(1, query.limit ?? 10));
@@ -46,39 +52,45 @@ export const findAllProducts = async (query: PaginateProductQuery = {}) => {
     prisma.product.count({ where }),
   ]);
 
-  const result = { data, meta: { page, limit, total, totalPage: Math.ceil(total / limit) } };
-
-  return result;
+  return { data, meta: { page, limit, total, totalPages: Math.ceil(total / limit) } };
 };
 
+/**
+ * Cari produk berdasarkan ID.
+ */
 export const findProductById = async (id: string): Promise<ProductResponse> => {
-  const isExist = await prisma.product.findUnique({
+  const product = await prisma.product.findUnique({
     where: { id },
     select: productSelect,
   });
 
-  if (!isExist) throw new AppError(`Product dengan id ${id} tidak ada`, 404);
+  if (!product) throw new AppError(`Product dengan id ${id} tidak ada`, 404);
 
-  return isExist;
+  return product;
 };
 
+/**
+ * Cek duplikasi product_name & slug (opsional exclude ID untuk update).
+ */
 const checkDuplicate = async (product_name: string, slug: string, excludeId?: string): Promise<void> => {
-  const isExisting = await prisma.product.findFirst({
+  const existing = await prisma.product.findFirst({
     where: {
       OR: [{ product_name }, { slug }],
       ...(excludeId && { NOT: { id: excludeId } }),
     },
   });
 
-  if (isExisting) {
-    if (isExisting.product_name === product_name) {
+  if (existing) {
+    if (existing.product_name === product_name) {
       throw new AppError("Product name already taken", 409);
     }
     throw new AppError("Slug already taken", 409);
   }
 };
 
-// CREATE produk dengan satu gambar
+/**
+ * Buat produk baru (tanpa gallery).
+ */
 export const createProduct = async (dto: CreateProductDto): Promise<ProductResponse> => {
   await checkDuplicate(dto.product_name, dto.slug);
 
@@ -90,7 +102,9 @@ export const createProduct = async (dto: CreateProductDto): Promise<ProductRespo
   return product;
 };
 
-// CREATE produk dengan gallery
+/**
+ * Buat produk baru dengan gambar gallery.
+ */
 export const createProductWithImages = async (dto: CreateProductWithImagesDto): Promise<ProductResponse> => {
   await checkDuplicate(dto.product_name, dto.slug);
 
@@ -111,6 +125,9 @@ export const createProductWithImages = async (dto: CreateProductWithImagesDto): 
   return product;
 };
 
+/**
+ * Update data produk.
+ */
 export const updateProduct = async (id: string, dto: UpdateProductDto): Promise<ProductResponse> => {
   await findProductById(id);
 
@@ -120,15 +137,15 @@ export const updateProduct = async (id: string, dto: UpdateProductDto): Promise<
     if (dto.product_name) orCondition.push({ product_name: dto.product_name });
     if (dto.slug) orCondition.push({ slug: dto.slug });
 
-    const isExisting = await prisma.product.findFirst({
+    const existing = await prisma.product.findFirst({
       where: {
         OR: orCondition,
         NOT: { id },
       },
     });
 
-    if (isExisting) {
-      if (isExisting.product_name === dto.product_name) {
+    if (existing) {
+      if (existing.product_name === dto.product_name) {
         throw new AppError("Product name already taken", 409);
       }
       throw new AppError("Slug already taken", 409);
@@ -149,7 +166,9 @@ export const updateProduct = async (id: string, dto: UpdateProductDto): Promise<
   });
 };
 
-// UPDATE gambar utama — hapus yang lama
+/**
+ * Update gambar utama produk — hapus file lama dari server.
+ */
 export const updateProductImage = async (id: string, newImagePath: string): Promise<ProductResponse> => {
   const product = await prisma.product.findUnique({
     where: { id },
@@ -160,25 +179,23 @@ export const updateProductImage = async (id: string, newImagePath: string): Prom
     throw new AppError(`Produk dengan id ${id} tidak ada`, 404);
   }
 
-  // Hapus file lama dari server
   if (product.image) {
     deleteFile(product.image);
   }
 
-  const productUpdate = await prisma.product.update({
+  return prisma.product.update({
     where: { id },
     data: { image: newImagePath },
     select: productSelect,
   });
-
-  return productUpdate;
 };
 
-// TAMBAH gambar ke gallery
+/**
+ * Tambah gambar ke gallery produk.
+ */
 export const addProductImages = async (productId: string, imagePaths: string[]): Promise<ProductResponse> => {
   await findProductById(productId);
 
-  // Cari order terakhir
   const lastImage = await prisma.productImage.findFirst({
     where: { productId },
     orderBy: { order: "desc" },
@@ -197,7 +214,9 @@ export const addProductImages = async (productId: string, imagePaths: string[]):
   return findProductById(productId);
 };
 
-// HAPUS satu gambar dari gallery
+/**
+ * Hapus satu gambar dari gallery (file + database).
+ */
 export const deleteProductImage = async (imageId: string): Promise<void> => {
   const image = await prisma.productImage.findUnique({
     where: { id: imageId },
@@ -205,12 +224,13 @@ export const deleteProductImage = async (imageId: string): Promise<void> => {
 
   if (!image) throw new AppError("Gambar tidak ditemukan", 404);
 
-  // Hapus file dari server dulu, baru hapus dari DB
   deleteFile(image.url);
-
   await prisma.productImage.delete({ where: { id: imageId } });
 };
 
+/**
+ * Hapus produk beserta semua file gambar terkait.
+ */
 export const deleteProduct = async (id: string): Promise<void> => {
   const product = await prisma.product.findUnique({
     where: { id },
@@ -222,7 +242,10 @@ export const deleteProduct = async (id: string): Promise<void> => {
 
   if (!product) throw new AppError(`Product dengan id ${id} tidak ada`, 404);
 
-  const allFiles: string[] = [...(product?.image ? [product.image] : []), ...(product?.images.map((img) => img.url) ?? [])];
+  const allFiles: string[] = [
+    ...(product.image ? [product.image] : []),
+    ...product.images.map((img) => img.url),
+  ];
 
   if (allFiles.length > 0) {
     deleteFiles(allFiles);

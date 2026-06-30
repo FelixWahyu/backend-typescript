@@ -1,54 +1,51 @@
-import { Request, Response, NextFunction } from "express";
+import { Request, Response } from "express";
 import { sendSuccess, sendCreated } from "../utils/response";
+import { catchAsync } from "../utils/catchAsync";
 import { register, login, refreshToken, logout } from "../services/authService";
 import { AuthRequest } from "../types";
 
-export const registerHandler = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-  try {
-    const result = await register(req.body);
-    sendCreated(res, result, "Register successfully");
-  } catch (error) {
-    next(error);
+/**
+ * POST /auth/register — Mendaftarkan user baru.
+ */
+export const registerHandler = catchAsync(async (req: Request, res: Response) => {
+  const result = await register(req.body);
+  sendCreated(res, result, "Register successfully");
+});
+
+/**
+ * POST /auth/login — Login dengan email & password.
+ */
+export const loginHandler = catchAsync(async (req: Request, res: Response) => {
+  const result = await login(req.body);
+  sendSuccess(res, result, "Login successfully");
+});
+
+/**
+ * POST /auth/refresh-token — Perbarui access token.
+ */
+export const refreshTokenHandler = catchAsync(async (req: Request, res: Response) => {
+  const { refreshToken: token } = req.body;
+  if (!token) {
+    res.status(400).json({ success: false, message: "Refresh token tidak ditemukan" });
+    return;
   }
-};
+  const result = await refreshToken(token);
+  sendSuccess(res, result, "Token berhasil diperbarui");
+});
 
-export const loginHandler = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-  try {
-    const authenticate = await login(req.body);
-    sendSuccess(res, authenticate, "Login successfully");
-  } catch (error) {
-    next(error);
-  }
-};
+/**
+ * POST /auth/logout — Hapus refresh token.
+ */
+export const logoutHandler = catchAsync(async (req: Request, res: Response) => {
+  const { refreshToken: token } = req.body;
+  if (token) await logout(token);
+  sendSuccess(res, null, "Logout berhasil");
+});
 
-export const refreshTokenHandler = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-  try {
-    const { refreshToken: token } = req.body;
-    if (!token) throw new Error("Refresh token tidak ditemukan");
-
-    const result = await refreshToken(token);
-    sendSuccess(res, result, "Token berhasil diperbarui");
-  } catch (error) {
-    next(error);
-  }
-};
-
-export const logoutHandler = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-  try {
-    const { refreshToken: token } = req.body;
-    if (token) await logout(token);
-
-    sendSuccess(res, null, "Logout berhasil");
-  } catch (error) {
-    next(error);
-  }
-};
-
-export const getMeHandler = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-  try {
-    const user = (req as AuthRequest).user;
-    sendSuccess(res, user, "Get current user success");
-  } catch (error) {
-    next(error);
-  }
-};
+/**
+ * GET /auth/me — Ambil data user yang sedang login.
+ */
+export const getMeHandler = catchAsync(async (req: Request, res: Response) => {
+  const user = (req as AuthRequest).user;
+  sendSuccess(res, user, "Get current user success");
+});

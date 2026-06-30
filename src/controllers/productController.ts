@@ -1,108 +1,103 @@
-import { NextFunction, Request, Response } from "express";
+import { Request, Response } from "express";
 import { sendSuccess, sendCreated } from "../utils/response";
+import { catchAsync } from "../utils/catchAsync";
 import { deleteFiles } from "../utils/fileHelper";
-import { ParamsDictionary } from "express-serve-static-core";
 import { createProduct, createProductWithImages, addProductImages, deleteProductImage, findAllProducts, updateProduct, findProductById, updateProductImage, deleteProduct } from "../services/productService";
 
-interface ProductParams extends ParamsDictionary {
-  id: string;
-}
-
-interface ImageParams extends ParamsDictionary {
-  imageId: string;
-}
-
-// GET /products — semua produk dengan pagination & filter
-export const getAllProducts = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-  try {
-    const result = await findAllProducts({
-      page: Number(req.query.page) || 1,
-      limit: Number(req.query.limit) || 10,
-      categoryId: req.query.categoryId as string | undefined,
-      search: req.query.search as string | undefined,
-    });
-    sendSuccess(res, result.data, "Get all products success", 200, result.meta);
-  } catch (error) {
-    next(error);
-  }
+/**
+ * Helper: ekstrak path file dari request upload.
+ */
+const getFilePath = (file?: Express.Multer.File): string | undefined => {
+  return file ? `uploads/products/${file.filename}` : undefined;
 };
 
-export const getProductById = async (req: Request<ProductParams>, res: Response, next: NextFunction): Promise<void> => {
-  try {
-    const product = await findProductById(req.params.id);
-    sendSuccess(res, product, "Get product success");
-  } catch (error) {
-    next(error);
-  }
+const getFilePaths = (files: Express.Multer.File[]): string[] => {
+  return files.map((f) => `uploads/products/${f.filename}`);
 };
 
-// POST /products — upload satu gambar
-export const createProductHandler = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-  const uploadFiles: string[] = [];
+/**
+ * GET /products — Semua produk (pagination, filter category & search).
+ */
+export const getAllProducts = catchAsync(async (req: Request, res: Response) => {
+  const result = await findAllProducts({
+    page: Number(req.query.page) || 1,
+    limit: Number(req.query.limit) || 10,
+    categoryId: req.query.categoryId as string | undefined,
+    search: req.query.search as string | undefined,
+  });
+  sendSuccess(res, result.data, "Get all products success", 200, result.meta);
+});
+
+/**
+ * GET /products/:id — Detail produk.
+ */
+export const getProductById = catchAsync(async (req: Request<{ id: string }>, res: Response) => {
+  const product = await findProductById(req.params.id);
+  sendSuccess(res, product, "Get product success");
+});
+
+/**
+ * POST /products — Buat produk baru (dengan upload gambar).
+ */
+export const createProductHandler = catchAsync(async (req: Request, res: Response) => {
+  const uploadedFiles: string[] = [];
 
   try {
     const filesObj = req.files as { [fieldname: string]: Express.Multer.File[] } | undefined;
-    const imageFile = filesObj?.["image"]?.[0] ?? req.file;
+    const imageFile = filesObj?.["image"]?.[0] ?? (Array.isArray(req.files) ? req.files[0] : req.file);
+    const imagePath = getFilePath(imageFile);
 
-    const imagePath = imageFile ? `uploads/products/${imageFile.filename}` : undefined;
-
-    if (imagePath) {
-      uploadFiles.push(imagePath);
-    }
-
-    const files = Array.isArray(req.files) ? req.files : [];
-    const imagePaths = files.map((f) => `uploads/products/${f.filename}`);
-
-    uploadFiles.push(...imagePaths);
+    if (imagePath) uploadedFiles.push(imagePath);
 
     const galleryFiles = filesObj?.["images"] ?? [];
-    const imagesPaths = galleryFiles.map((f) => `uploads/products/${f.filename}`);
+    const imagesPaths = getFilePaths(galleryFiles);
+    uploadedFiles.push(...imagesPaths);
+
+    const productData = {
+      ...req.body,
+      price: Number(req.body.price),
+      image: imagePath,
+    };
 
     const product =
       imagesPaths.length > 0
-        ? await createProductWithImages({
-            ...req.body,
-            price: Number(req.body.price),
-            image: imagePath,
-            images: imagesPaths,
-          })
-        : await createProduct({
-            ...req.body,
-            price: Number(req.body.price),
-            image: imagePath,
-          });
+        ? await createProductWithImages({ ...productData, images: imagesPaths })
+        : await createProduct(productData);
 
     sendCreated(res, product, "Produk berhasil dibuat");
   } catch (error) {
-    // Kalau gagal, hapus file yang sudah terupload
-    if (uploadFiles.length > 0) deleteFiles(uploadFiles);
-    next(error);
+    if (uploadedFiles.length > 0) deleteFiles(uploadedFiles);
+    throw error;
   }
-};
+});
 
-// POST /products/:id/images — tambah gambar ke gallery
-export const addImagesHandler = async (req: Request<ProductParams>, res: Response, next: NextFunction): Promise<void> => {
+/**
+ * POST /products/:id/images — Tambah gambar ke gallery.
+ */
+export const addImagesHandler = catchAsync(async (req: Request<{ id: string }>, res: Response) => {
   const uploadedFiles: string[] = [];
 
   try {
     const files = Array.isArray(req.files) ? req.files : [];
-    const imagePaths = files.map((f) => `uploads/products/${f.filename}`);
-
+    const imagePaths = getFilePaths(files);
     uploadedFiles.push(...imagePaths);
 
     const product = await addProductImages(req.params.id, imagePaths);
     sendSuccess(res, product, "Gambar berhasil ditambahkan");
   } catch (error) {
     if (uploadedFiles.length > 0) deleteFiles(uploadedFiles);
-    next(error);
+    throw error;
   }
-};
+});
 
-export const updateProductHandler = async (req: Request<ProductParams>, res: Response, next: NextFunction): Promise<void> => {
+/**
+ * PUT /products/:id — Update produk & gambar utama.
+ */
+export const updateProductHandler = catchAsync(async (req: Request<{ id: string }>, res: Response) => {
   const uploadedFiles: string[] = [];
-  try {
-    const imagePath = req.file ? `uploads/products/${req.file.filename}` : undefined;
 
+  try {
+    const imagePath = getFilePath(req.file);
     if (imagePath) uploadedFiles.push(imagePath);
 
     const updatedData = {
@@ -110,30 +105,31 @@ export const updateProductHandler = async (req: Request<ProductParams>, res: Res
       price: req.body.price ? Number(req.body.price) : undefined,
     };
 
-    const product = imagePath ? await Promise.all([updateProduct(req.params.id, updatedData), updateProductImage(req.params.id, imagePath)]).then(([, updated]) => updated) : await updateProduct(req.params.id, updatedData);
+    const product = imagePath
+      ? await updateProduct(req.params.id, updatedData).then(() =>
+          updateProductImage(req.params.id, imagePath),
+        )
+      : await updateProduct(req.params.id, updatedData);
 
     sendSuccess(res, product, "Updated product successfully");
   } catch (error) {
     if (uploadedFiles.length > 0) deleteFiles(uploadedFiles);
-    next(error);
+    throw error;
   }
-};
+});
 
-// DELETE /products/images/:imageId — hapus satu gambar dari gallery
-export const deleteImageHandler = async (req: Request<ImageParams>, res: Response, next: NextFunction): Promise<void> => {
-  try {
-    await deleteProductImage(req.params.imageId);
-    sendSuccess(res, null, "Gambar berhasil dihapus");
-  } catch (error) {
-    next(error);
-  }
-};
+/**
+ * DELETE /products/images/:imageId — Hapus satu gambar gallery.
+ */
+export const deleteImageHandler = catchAsync(async (req: Request<{ imageId: string }>, res: Response) => {
+  await deleteProductImage(req.params.imageId);
+  sendSuccess(res, null, "Gambar berhasil dihapus");
+});
 
-export const deleteProductHandler = async (req: Request<ProductParams>, res: Response, next: NextFunction): Promise<void> => {
-  try {
-    await deleteProduct(req.params.id);
-    sendSuccess(res, null, "Deleted product successfully");
-  } catch (error) {
-    next(error);
-  }
-};
+/**
+ * DELETE /products/:id — Hapus produk beserta semua gambar.
+ */
+export const deleteProductHandler = catchAsync(async (req: Request<{ id: string }>, res: Response) => {
+  await deleteProduct(req.params.id);
+  sendSuccess(res, null, "Deleted product successfully");
+});

@@ -1,70 +1,60 @@
-import { Request, Response, NextFunction } from "express";
+import { Request, Response } from "express";
 import { sendSuccess, sendCreated } from "../utils/response";
+import { catchAsync } from "../utils/catchAsync";
 import { findAllCategory, findCategoryById, findCategoryWithProduct, createCategory, updateCategory, deleteCategory } from "../services/categoryService";
 
-interface CategoryParams {
-  id: string;
-}
+/**
+ * GET /categories — Semua kategori.
+ */
+export const getCategories = catchAsync(async (_req: Request, res: Response) => {
+  const categories = await findAllCategory();
+  sendSuccess(res, categories, "Get all categories success");
+});
 
-export const getCategories = async (_req: Request, res: Response, next: NextFunction): Promise<void> => {
-  try {
-    const categories = await findAllCategory();
-    sendSuccess(res, categories, "Get all categories success");
-  } catch (error) {
-    next(error);
-  }
-};
+/**
+ * GET /categories/:id — Detail kategori.
+ */
+export const getCategoryById = catchAsync(async (req: Request<{ id: string }>, res: Response) => {
+  const category = await findCategoryById(req.params.id);
+  sendSuccess(res, category, "Get category success");
+});
 
-export const getCategoryById = async (req: Request<CategoryParams>, res: Response, next: NextFunction): Promise<void> => {
-  try {
-    const category = await findCategoryById(req.params.id);
-    sendSuccess(res, category, "Get category success");
-  } catch (error) {
-    next(error);
-  }
-};
+/**
+ * GET /categories/:id/products — Kategori dengan daftar produk.
+ */
+export const getCategoryWithProduct = catchAsync(async (req: Request<{ id: string }>, res: Response) => {
+  const categoryWithProduct = await findCategoryWithProduct(req.params.id);
+  sendSuccess(res, categoryWithProduct, "Get category with product success");
+});
 
-export const getCategoryWithProduct = async (req: Request<CategoryParams>, res: Response, next: NextFunction): Promise<void> => {
-  try {
-    const categoryWithProduct = await findCategoryWithProduct(req.params.id);
-    sendSuccess(res, categoryWithProduct, "Get category with product success");
-  } catch (error) {
-    next(error);
-  }
-};
+/**
+ * POST /categories — Buat kategori baru.
+ */
+export const createCategoryHandler = catchAsync(async (req: Request, res: Response) => {
+  const category = await createCategory(req.body);
+  sendCreated(res, category, "Category created successfully");
+});
 
-export const createNewCategory = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-  try {
-    const category = await createCategory(req.body);
-    sendCreated(res, category, "Category created successfully");
-  } catch (error) {
-    next(error);
-  }
-};
+/**
+ * GET /categories/:id/edit — Data kategori untuk form edit.
+ */
+export const getEditCategory = catchAsync(async (req: Request<{ id: string }>, res: Response) => {
+  const category = await findCategoryById(req.params.id);
+  sendSuccess(res, category, "Get category for edit success");
+});
 
-export const getEditCategory = async (req: Request<CategoryParams>, res: Response, next: NextFunction): Promise<void> => {
-  try {
-    const category = await findCategoryById(req.params.id);
-    sendSuccess(res, category, "Get category for edit success");
-  } catch (error) {
-    next(error);
-  }
-};
+/**
+ * PUT /categories/:id — Update kategori.
+ */
+export const updateCategoryHandler = catchAsync(async (req: Request<{ id: string }>, res: Response) => {
+  const category = await updateCategory(req.params.id, req.body);
+  sendSuccess(res, category, "Category updated successfully");
+});
 
-export const updatedCategory = async (req: Request<CategoryParams>, res: Response, next: NextFunction): Promise<void> => {
-  try {
-    const category = await updateCategory(req.params.id, req.body);
-    sendSuccess(res, category, "Category updated successfully");
-  } catch (error) {
-    next(error);
-  }
-};
-
-export const deletedCategory = async (req: Request<CategoryParams>, res: Response, next: NextFunction): Promise<void> => {
-  try {
-    await deleteCategory(req.params.id);
-    sendSuccess(res, null, "Category deleted successfully");
-  } catch (error) {
-    next(error);
-  }
-};
+/**
+ * DELETE /categories/:id — Hapus kategori.
+ */
+export const deleteCategoryHandler = catchAsync(async (req: Request<{ id: string }>, res: Response) => {
+  await deleteCategory(req.params.id);
+  sendSuccess(res, null, "Category deleted successfully");
+});

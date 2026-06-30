@@ -3,7 +3,7 @@ import { AppError } from "../utils/appError";
 import { verifyAccessToken } from "../utils/jwt";
 import { AuthRequest } from "../types";
 
-export const authenticate = (req: Request, res: Response, next: NextFunction): void => {
+export const authenticate = (req: Request, _res: Response, next: NextFunction): void => {
   try {
     const authHeader = req.headers.authorization;
 
@@ -37,7 +37,7 @@ export const authenticate = (req: Request, res: Response, next: NextFunction): v
 };
 
 export const authorize = (...role: string[]) => {
-  const roleAuthorize = (req: Request, res: Response, next: NextFunction): void => {
+  const roleAuthorize = (req: Request, _res: Response, next: NextFunction): void => {
     const user = (req as AuthRequest).user;
 
     if (!user) {
