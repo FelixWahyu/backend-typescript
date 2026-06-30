@@ -55,7 +55,6 @@ export const createProductHandler = catchAsync(async (req: Request, res: Respons
 
     const productData = {
       ...req.body,
-      price: Number(req.body.price),
       image: imagePath,
     };
 
@@ -100,10 +99,7 @@ export const updateProductHandler = catchAsync(async (req: Request<{ id: string 
     const imagePath = getFilePath(req.file);
     if (imagePath) uploadedFiles.push(imagePath);
 
-    const updatedData = {
-      ...req.body,
-      price: req.body.price ? Number(req.body.price) : undefined,
-    };
+    const updatedData = { ...req.body };
 
     const product = imagePath
       ? await updateProduct(req.params.id, updatedData).then(() =>
