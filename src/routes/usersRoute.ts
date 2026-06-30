@@ -10,7 +10,7 @@ router.get("/", authenticate, getUsers);
 router.post("/", authenticate, authorize("ADMIN"), validate(createUserSchema), createUserHandler);
 router.get("/:id", authenticate, getUserById);
 router.get("/:id/edit", authenticate, getEditUser);
-router.put("/:id", authenticate, validate(updateUserSchema), updateUser);
+router.put("/:id", authenticate, authorize("ADMIN"), validate(updateUserSchema), updateUser);
 router.delete("/:id", authenticate, authorize("ADMIN"), deleteUser);
 
 export default router;
