@@ -1,6 +1,7 @@
-import { Request, Response, NextFunction } from "express";
+import { Request, Response } from "express";
 import { sendSuccess, sendCreated } from "../utils/response";
+import { catchAsync } from "../utils/catchAsync";
 
 export class BlogController {
-  static async createBlog(req: Request, res: Response, next: NextFunction) {}
+  static createBlog = catchAsync(async (req: Request, res: Response) => {});
 }

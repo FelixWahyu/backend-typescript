@@ -1,7 +1,7 @@
 export interface PostAuthor {
   id: string;
   name: string | null;
-  username: string;
+  email: string;
 }
 
 export interface CreatePost {

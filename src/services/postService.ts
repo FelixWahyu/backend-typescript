@@ -14,7 +14,7 @@ const selectPost = {
     select: {
       id: true,
       name: true,
-      username: true,
+      email: true,
     },
   },
   createdAt: true,

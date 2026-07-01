@@ -4,6 +4,7 @@ import usersRoutes from "../routes/usersRoute";
 import productRoutes from "../routes/productRoute";
 import categoriesRoutes from "../routes/categoryRoute";
 import authRoutes from "../routes/authRoute";
+import postRoutes from "../routes/postRoute";
 
 const router = Router();
 
@@ -12,5 +13,6 @@ router.get("/health", healthCheck);
 router.use("/users", usersRoutes);
 router.use("/categories", categoriesRoutes);
 router.use("/products", productRoutes);
+router.use("/posts", postRoutes);
 
 export default router;
