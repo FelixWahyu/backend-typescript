@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { sendSuccess, sendCreated } from "../utils/response";
 import { catchAsync } from "../utils/catchAsync";
 import { register, login, refreshToken, logout } from "../services/authService";
+import { blacklistToken, cleanupExpiredTokens } from "../services/blacklist.service";
 import { AuthRequest } from "../types";
 
 /**
@@ -39,6 +40,14 @@ export const refreshTokenHandler = catchAsync(async (req: Request, res: Response
 export const logoutHandler = catchAsync(async (req: Request, res: Response) => {
   const { refreshToken: token } = req.body;
   if (token) await logout(token);
+
+  const authHeader = req.headers.authorization;
+  if (authHeader?.startsWith("Bearer ")) {
+    const accessToken = authHeader.split(" ")[1];
+    await blacklistToken(accessToken);
+    await cleanupExpiredTokens();
+  }
+
   sendSuccess(res, null, "Logout berhasil");
 });
 

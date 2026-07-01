@@ -39,6 +39,15 @@ model Post {
   author User @relation(fields: [authorId], references: [id])
 }
 
+model BlacklistedToken {
+  id        String   @id @default(uuid())
+  tokenHash String   @unique @db.VarChar(500)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@map("blacklisted_tokens")
+}
+
 model RefreshToken {
   id        String   @id @default(uuid())
   token     String   @unique  @db.VarChar(500)

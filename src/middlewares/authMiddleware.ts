@@ -1,9 +1,10 @@
 import { Request, Response, NextFunction } from "express";
 import { AppError } from "../utils/appError";
 import { verifyAccessToken } from "../utils/jwt";
+import { isTokenBlacklisted } from "../services/blacklist.service";
 import { AuthRequest } from "../types";
 
-export const authenticate = (req: Request, _res: Response, next: NextFunction): void => {
+export const authenticate = async (req: Request, _res: Response, next: NextFunction): Promise<void> => {
   try {
     const authHeader = req.headers.authorization;
 
@@ -13,6 +14,11 @@ export const authenticate = (req: Request, _res: Response, next: NextFunction): 
 
     const token = authHeader.split(" ")[1];
     const payload = verifyAccessToken(token);
+
+    const blacklisted = await isTokenBlacklisted(token);
+    if (blacklisted) {
+      throw new AppError("Token sudah tidak berlaku, silakan login kembali", 401);
+    }
 
     (req as AuthRequest).user = {
       id: payload.id,
