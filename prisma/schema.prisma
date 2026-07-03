@@ -39,6 +39,18 @@ model Post {
   author User @relation(fields: [authorId], references: [id])
 }
 
+model Blog {
+  id      String @id @default(uuid())
+  title   String
+  slug    String @unique
+  description String?
+  published   Boolean @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("blogs")
+}
+
 model BlacklistedToken {
   id        String   @id @default(uuid())
   tokenHash String   @unique @db.VarChar(500)

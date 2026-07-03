@@ -1,14 +1,28 @@
-export interface BlogRequest {
+export interface CreateBlog {
   title: string;
   slug: string;
-  description: string;
+  description?: string;
+  published?: boolean;
 }
 
-export interface BlogResponse {
-  id: string | number;
+export interface UpdateBlog {
+  title?: string;
+  slug?: string;
+  description?: string;
+  published?: boolean;
+}
+
+export interface ResponseBlog {
+  id: string;
   title: string;
   slug: string;
-  description: string;
+  description: string | null;
+  published: boolean | null;
   createdAt: Date;
   updatedAt: Date;
+}
+
+export interface PaginationQuery {
+  page?: number;
+  limit?: number;
 }
