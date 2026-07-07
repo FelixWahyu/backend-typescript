@@ -1,6 +1,6 @@
 import { prisma } from "../lib/prisma";
 import { AppError } from "../utils/appError";
-import { CreateBlog, ResponseBlog } from "../types/blog.type";
+import { CreateBlog, ResponseBlog, UpdateBlog } from "../types/blog.type";
 
 export class BlogService {
   static async createBlog(request: CreateBlog): Promise<ResponseBlog> {
@@ -15,5 +15,24 @@ export class BlogService {
     });
 
     return blog;
+  }
+
+  static async updateBlog(id: string, request: UpdateBlog): Promise<ResponseBlog> {
+    const blogIsExisting = await prisma.blog.findUnique({
+      where: {
+        id: id,
+      },
+    });
+
+    if (!blogIsExisting) {
+      throw new AppError(`Data blog tidak ada.`, 404);
+    }
+
+    const updatedBlog = await prisma.blog.update({
+      where: { id: id },
+      data: request,
+    });
+
+    return updatedBlog;
   }
 }
