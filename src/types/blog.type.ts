@@ -1,13 +1,13 @@
 export interface CreateBlog {
   title: string;
-  slug: string;
+  // slug: string;
   description?: string;
   published?: boolean;
 }
 
 export interface UpdateBlog {
   title?: string;
-  slug?: string;
+  // slug?: string;
   description?: string;
   published?: boolean;
 }
