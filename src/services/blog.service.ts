@@ -3,8 +3,25 @@ import { Prisma } from "../generated/prisma/client";
 import { AppError } from "../utils/appError";
 import { generateUniqueSlug } from "../utils/slug";
 import { CreateBlog, ResponseBlog, UpdateBlog } from "../types/blog.type";
+import { toBlogResponse } from "../model/blog.model";
 
 export class BlogService {
+  static async getAllBlog(): Promise<Array<ResponseBlog>> {
+    const blogs = await prisma.blog.findMany();
+
+    return blogs.map((blog) => toBlogResponse(blog));
+  }
+
+  static async getBlogById(id: string): Promise<ResponseBlog> {
+    const blog = await prisma.blog.findUnique({
+      where: { id },
+    });
+
+    if (!blog) throw new AppError("Data blog tidak ada.", 404);
+
+    return blog;
+  }
+
   static async createBlog(request: CreateBlog): Promise<ResponseBlog> {
     const existing = await prisma.blog.findFirst({
       where: { title: request.title },
@@ -56,5 +73,19 @@ export class BlogService {
     });
 
     return updatedBlog;
+  }
+
+  static async deleteBlog(id: string): Promise<void> {
+    const blog = await prisma.blog.findUnique({
+      where: { id },
+    });
+
+    if (!blog) throw new AppError("Data blog tidak ada.", 404);
+
+    await prisma.blog.delete({
+      where: {
+        id,
+      },
+    });
   }
 }
