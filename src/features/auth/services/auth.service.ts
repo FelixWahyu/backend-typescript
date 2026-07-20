@@ -115,5 +115,12 @@ export class AuthService {
 
   static async logout(token: string): Promise<void> {
     await prisma.refreshToken.deleteMany({ where: { token: hashToken(token) } });
+    await this.cleanupExpiredRefreshTokens();
+  }
+
+  static async cleanupExpiredRefreshTokens(): Promise<void> {
+    await prisma.refreshToken.deleteMany({
+      where: { expiresAt: { lt: new Date() } },
+    });
   }
 }
