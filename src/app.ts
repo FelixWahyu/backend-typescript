@@ -6,6 +6,7 @@ import { env } from "./config/env";
 import routes from "./routes/index";
 import { errorHandler, notFoundHandler } from "./middlewares/errorHandler";
 import path from "path";
+import { setupSwagger } from "./config/swagger";
 
 const app: Application = express();
 
@@ -35,6 +36,9 @@ if (env.isDev()) {
 // ─── Routes ───────────────────────────────────────────────────────────────────
 app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 app.use(`/api/${env.API_VERSION}`, routes);
+
+// ─── Swagger Documentation ───────────────────────────────────────────────────
+setupSwagger(app);
 
 // ─── Error Handling ───────────────────────────────────────────────────────────
 app.use(notFoundHandler);
