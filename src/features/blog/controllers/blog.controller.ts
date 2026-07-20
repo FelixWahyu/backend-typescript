@@ -19,6 +19,11 @@ export class BlogController {
     sendCreated(res, createdNewBlog, "Create new blog successfully.");
   });
 
+  static getEdit = catchAsync(async (req: Request<{ id: string }>, res: Response) => {
+    const blog = await BlogService.getBlogById(req.params.id);
+    sendSuccess(res, blog, "Get blog for edit successfully.");
+  });
+
   static update = catchAsync(async (req: Request<{ id: string }>, res: Response) => {
     const updatedBlog = await BlogService.updateBlog(req.params.id, req.body);
     sendSuccess(res, updatedBlog, "Updated blog successfully.");

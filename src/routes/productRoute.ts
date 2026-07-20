@@ -9,6 +9,7 @@ const router = Router();
 
 router.get("/", ProductController.getAll);
 router.get("/:id", ProductController.getById);
+router.get("/:id/edit", authenticate, authorize("ADMIN"), ProductController.getEdit);
 
 router.post("/", authenticate, authorize("ADMIN"), uploadFields, validate(createProductSchema), ProductController.create);
 router.post("/:id/images", authenticate, authorize("ADMIN"), uploadMultiple, ProductController.addImages);

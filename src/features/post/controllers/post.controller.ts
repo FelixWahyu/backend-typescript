@@ -23,6 +23,11 @@ export class PostController {
     sendCreated(res, post, "Create post is successfully.");
   });
 
+  static getEdit = catchAsync(async (req: Request<{ id: string }>, res: Response) => {
+    const post = await PostService.getPostById(req.params.id);
+    sendSuccess(res, post, "Get post for edit successfully.");
+  });
+
   static update = catchAsync(async (req: Request<{ id: string }>, res: Response) => {
     const post = await PostService.updatePost(req.params.id, req.body);
     sendSuccess(res, post, "Post updated successfully.");

@@ -8,6 +8,7 @@ const router = Router();
 
 router.get("/", PostController.getAll);
 router.get("/:id", PostController.getById);
+router.get("/:id/edit", authenticate, authorize("ADMIN"), PostController.getEdit);
 
 router.post("/", authenticate, authorize("ADMIN"), validate(createPostSchema), PostController.create);
 router.put("/:id", authenticate, authorize("ADMIN"), validate(updatePostSchema), PostController.update);

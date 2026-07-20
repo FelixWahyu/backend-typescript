@@ -61,6 +61,11 @@ export class ProductController {
     }
   });
 
+  static getEdit = catchAsync(async (req: Request<{ id: string }>, res: Response) => {
+    const product = await ProductService.getProductById(req.params.id);
+    sendSuccess(res, product, "Get product for edit successfully.");
+  });
+
   static update = catchAsync(async (req: Request<{ id: string }>, res: Response) => {
     const uploadedFiles: string[] = [];
     try {

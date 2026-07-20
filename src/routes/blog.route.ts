@@ -7,6 +7,7 @@ const router = Router();
 
 router.get("/", BlogController.getAll);
 router.get("/:id", BlogController.getById);
+router.get("/:id/edit", BlogController.getEdit);
 router.post("/", validate(createBlogSchema), BlogController.create);
 router.put("/:id", validate(updateBlogSchema), BlogController.update);
 router.delete("/:id", BlogController.delete);
