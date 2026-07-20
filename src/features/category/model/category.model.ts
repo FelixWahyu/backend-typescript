@@ -1,5 +1,25 @@
 import { Category } from "@/generated/prisma/client";
-import { ResponseCategory } from "../types/category.type";
+
+export type ResponseCategory = {
+  id: string;
+  category_name: string;
+  slug: string;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+export type CreateCategory = {
+  category_name: string;
+};
+
+export type UpdateCategory = {
+  category_name?: string;
+};
+
+export type PaginationQuery = {
+  limit?: number;
+  page?: number;
+};
 
 export function toCategoryResponse(category: Category): ResponseCategory {
   return {

@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
 import { env } from "../config/env";
-import { TokenPayload, AuthTokens } from "../types/auth.type";
+import { TokenPayload, AuthTokens } from "../features/auth/model/auth.model";
 import crypto from "crypto";
 
 export const hashToken = (token: string): string => {

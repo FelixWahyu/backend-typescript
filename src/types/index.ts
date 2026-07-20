@@ -1,21 +1,21 @@
 import { Request } from "express";
 
-export interface ApiError {
+export type ApiError = {
   field?: string;
   message: string;
-}
+};
 
 // Extended Request with authenticated user
-export interface AuthRequest extends Request {
+export type AuthRequest = Request & {
   user?: {
     id: string;
     email: string;
     role: string;
   };
-}
+};
 
 // Standard API Response shape
-export interface ApiResponse<T = unknown> {
+export type ApiResponse<T = unknown> = {
   success: boolean;
   message: string;
   data?: T;
@@ -26,4 +26,4 @@ export interface ApiResponse<T = unknown> {
     total?: number;
     totalPages?: number;
   } | null;
-}
+};

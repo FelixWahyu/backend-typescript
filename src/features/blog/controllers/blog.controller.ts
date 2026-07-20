@@ -14,17 +14,17 @@ export class BlogController {
     sendSuccess(res, blog, "Get blog by id successfully.");
   });
 
-  static createdBlog = catchAsync(async (req: Request, res: Response) => {
+  static create = catchAsync(async (req: Request, res: Response) => {
     const createdNewBlog = await BlogService.createBlog(req.body);
     sendCreated(res, createdNewBlog, "Create new blog successfully.");
   });
 
-  static updatedBlog = catchAsync(async (req: Request<{ id: string }>, res: Response) => {
+  static update = catchAsync(async (req: Request<{ id: string }>, res: Response) => {
     const updatedBlog = await BlogService.updateBlog(req.params.id, req.body);
     sendSuccess(res, updatedBlog, "Updated blog successfully.");
   });
 
-  static deleteBlog = catchAsync(async (req: Request<{ id: string }>, res: Response) => {
+  static delete = catchAsync(async (req: Request<{ id: string }>, res: Response) => {
     await BlogService.deleteBlog(req.params.id);
     sendSuccess(res, null, "Delete blog successfully.");
   });

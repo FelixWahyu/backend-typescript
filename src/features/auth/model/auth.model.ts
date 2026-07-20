@@ -1,27 +1,27 @@
-export interface RegisterDto {
+export type RegisterDto = {
   name: string;
   username: string;
   email: string;
   password: string;
-}
+};
 
-export interface LoginDto {
+export type LoginDto = {
   email: string;
   password: string;
-}
+};
 
-export interface TokenPayload {
+export type TokenPayload = {
   id: string;
   email: string;
   role: string;
-}
+};
 
-export interface AuthTokens {
+export type AuthTokens = {
   accessToken: string;
   refreshToken: string;
-}
+};
 
-export interface AuthResponse {
+export type AuthResponse = {
   user: {
     id: string;
     name: string | null;
@@ -30,4 +30,4 @@ export interface AuthResponse {
     role: string;
   };
   tokens: AuthTokens;
-}
+};

@@ -7,7 +7,6 @@ import { CreateBlog, UpdateBlog, ResponseBlog, toBlogResponse } from "../model/b
 export class BlogService {
   static async getBlogs(): Promise<Array<ResponseBlog>> {
     const blogs = await prisma.blog.findMany();
-    if (!blogs) throw new AppError("Data blog belum ditambahkan.", 404);
     return blogs.map((blog) => toBlogResponse(blog));
   }
 
@@ -16,7 +15,7 @@ export class BlogService {
       where: { id },
     });
     if (!blog) throw new AppError("Data blog tidak ditemukan.", 404);
-    return blog;
+    return toBlogResponse(blog);
   }
 
   static async createBlog(request: CreateBlog): Promise<ResponseBlog> {
@@ -28,7 +27,7 @@ export class BlogService {
     const created = await prisma.blog.create({
       data: { ...request, slug },
     });
-    return created;
+    return toBlogResponse(created);
   }
 
   static async updateBlog(id: string, request: UpdateBlog): Promise<ResponseBlog> {
@@ -48,7 +47,7 @@ export class BlogService {
       where: { id },
       data: updateBlog,
     });
-    return updated;
+    return toBlogResponse(updated);
   }
 
   static async deleteBlog(id: string): Promise<void> {

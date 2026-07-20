@@ -14,22 +14,22 @@ export class CategoryController {
     sendSuccess(res, category, "Get category by id successfully.");
   });
 
-  static createCategory = catchAsync(async (req: Request, res: Response) => {
+  static create = catchAsync(async (req: Request, res: Response) => {
     const createCategory = await CategoryService.createCategory(req.body);
     sendCreated(res, createCategory, "Category created is successfully.");
   });
 
-  static getEditCategory = catchAsync(async (req: Request<{ id: string }>, res: Response) => {
+  static getEdit = catchAsync(async (req: Request<{ id: string }>, res: Response) => {
     const getEdit = await CategoryService.getCategoryById(req.params.id);
     sendSuccess(res, getEdit, "Get category for edit successfully.");
   });
 
-  static updateCategory = catchAsync(async (req: Request<{ id: string }>, res: Response) => {
+  static update = catchAsync(async (req: Request<{ id: string }>, res: Response) => {
     const updateCategory = await CategoryService.updateCategory(req.params.id, req.body);
     sendSuccess(res, updateCategory, "Updated category successfully.");
   });
 
-  static deleteCategory = catchAsync(async (req: Request<{ id: string }>, res: Response) => {
+  static delete = catchAsync(async (req: Request<{ id: string }>, res: Response) => {
     await CategoryService.deleteCategory(req.params.id);
     sendSuccess(res, null, "Delete category successfully.");
   });

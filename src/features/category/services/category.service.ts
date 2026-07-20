@@ -2,8 +2,7 @@ import { prisma } from "../../../lib/prisma";
 import { Prisma } from "@/generated/prisma/client";
 import { AppError } from "../../../utils/appError";
 import { generateUniqueSlug } from "../../../utils/slug";
-import { CreateCategory, UpdateCategory, ResponseCategory } from "../types/category.type";
-import { toCategoryResponse } from "../model/category.model";
+import { CreateCategory, UpdateCategory, ResponseCategory, toCategoryResponse } from "../model/category.model";
 
 export class CategoryService {
   static async getAllCategories(): Promise<Array<ResponseCategory>> {
@@ -19,7 +18,7 @@ export class CategoryService {
 
     if (!category) throw new AppError("Category is not found.", 404);
 
-    return category;
+    return toCategoryResponse(category);
   }
 
   static async createCategory(request: CreateCategory): Promise<ResponseCategory> {
@@ -35,7 +34,7 @@ export class CategoryService {
       data: { ...request, slug },
     });
 
-    return createCategory;
+    return toCategoryResponse(createCategory);
   }
 
   static async updateCategory(id: string, request: UpdateCategory): Promise<ResponseCategory> {
@@ -53,7 +52,7 @@ export class CategoryService {
       data: UpdatedCategory,
     });
 
-    return updated;
+    return toCategoryResponse(updated);
   }
 
   static async deleteCategory(id: string): Promise<void> {

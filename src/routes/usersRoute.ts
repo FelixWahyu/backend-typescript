@@ -1,16 +1,16 @@
 import { Router } from "express";
-import { getUsers, createUserHandler, getUserById, getEditUser, updateUser, deleteUser } from "../controllers/usersController";
+import { UserController } from "../features/user/controllers/user.controller";
 import { authenticate, authorize } from "../middlewares/authMiddleware";
 import { validate } from "../middlewares/validate";
-import { createUserSchema, updateUserSchema } from "../validations";
+import { createUserSchema, updateUserSchema } from "../features/user/validations/user.schema";
 
 const router = Router();
 
-router.get("/", authenticate, getUsers);
-router.post("/", authenticate, authorize("ADMIN"), validate(createUserSchema), createUserHandler);
-router.get("/:id", authenticate, getUserById);
-router.get("/:id/edit", authenticate, getEditUser);
-router.put("/:id", authenticate, authorize("ADMIN"), validate(updateUserSchema), updateUser);
-router.delete("/:id", authenticate, authorize("ADMIN"), deleteUser);
+router.get("/", authenticate, UserController.getAll);
+router.post("/", authenticate, authorize("ADMIN"), validate(createUserSchema), UserController.create);
+router.get("/:id", authenticate, UserController.getById);
+router.get("/:id/edit", authenticate, UserController.getEditUser);
+router.put("/:id", authenticate, authorize("ADMIN"), validate(updateUserSchema), UserController.update);
+router.delete("/:id", authenticate, authorize("ADMIN"), UserController.delete);
 
 export default router;
