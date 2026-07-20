@@ -1,11 +1,11 @@
 import { Router } from "express";
 import { healthCheck } from "../controllers/healthController";
-import usersRoutes from "../routes/usersRoute";
-import productRoutes from "../routes/productRoute";
-import categoriesRoutes from "../routes/categoryRoute";
-import authRoutes from "../routes/authRoute";
-import postRoutes from "../routes/postRoute";
-import blogRoutes from "../routes/blog.route";
+import usersRoutes from "../features/user/routes/user.route";
+import productRoutes from "../features/product/routes/product.route";
+import categoriesRoutes from "../features/category/routes/category.route";
+import authRoutes from "../features/auth/routes/auth.route";
+import postRoutes from "../features/post/routes/post.route";
+import blogRoutes from "../features/blog/routes/blog.route";
 
 const router = Router();
 

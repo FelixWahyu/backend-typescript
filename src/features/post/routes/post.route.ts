@@ -1,8 +1,8 @@
 import { Router } from "express";
-import { PostController } from "../features/post/controllers/post.controller";
-import { authenticate, authorize } from "../middlewares/authMiddleware";
-import { validate } from "../middlewares/validate";
-import { createPostSchema, updatePostSchema } from "../features/post/validations/post.schema";
+import { PostController } from "../controllers/post.controller";
+import { authenticate, authorize } from "../../../middlewares/authMiddleware";
+import { validate } from "../../../middlewares/validate";
+import { createPostSchema, updatePostSchema } from "../validations/post.schema";
 
 const router = Router();
 

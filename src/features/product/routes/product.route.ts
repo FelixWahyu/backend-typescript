@@ -1,9 +1,9 @@
 import { Router } from "express";
-import { uploadSingle, uploadMultiple, uploadFields } from "../config/multer";
-import { ProductController } from "../features/product/controllers/product.controller";
-import { authenticate, authorize } from "../middlewares/authMiddleware";
-import { validate } from "../middlewares/validate";
-import { createProductSchema, updateProductSchema } from "../features/product/validations/product.schema";
+import { uploadSingle, uploadMultiple, uploadFields } from "../../../config/multer";
+import { ProductController } from "../controllers/product.controller";
+import { authenticate, authorize } from "../../../middlewares/authMiddleware";
+import { validate } from "../../../middlewares/validate";
+import { createProductSchema, updateProductSchema } from "../validations/product.schema";
 
 const router = Router();
 
